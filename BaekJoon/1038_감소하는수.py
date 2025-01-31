@@ -66,8 +66,8 @@ from typing import List
 answer = -1
 inp_item: int = int(input())
 
-now_nums: List[int] = [9, 8, 7, 6, 5, 4]
-limit_nums = [5,4,3,2,1,0] # 최소한으로 가져야하는 수
+now_nums: List[int] = [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
+limit_nums = [9, 8, 7, 6, 5, 4, 3, 2, 1, 0] # 최소한으로 가져야하는 수
 
 slice_cnt = 0
 all_lower_nums = []
@@ -109,6 +109,6 @@ else:
     answer = all_lower_nums[inp_item]
     print(answer)
 
-print('-----\n')
-print(all_lower_nums)
-print(len(all_lower_nums))
+# print('-----\n')
+# for item in all_lower_nums:
+#     print(item)
