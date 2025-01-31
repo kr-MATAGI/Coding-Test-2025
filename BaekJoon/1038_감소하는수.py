@@ -1,3 +1,6 @@
+import sys
+input = sys.stdin.readline
+
 from typing import List
 '''
     음이 아닌 정수 X의 자릿수가 가장 큰 자릿수부터 작은 자릿수까지 감소한다면, 그 수를 감소하는 수라고 한다.
