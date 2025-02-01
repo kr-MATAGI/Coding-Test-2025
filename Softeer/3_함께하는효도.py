@@ -1,5 +1,6 @@
 import copy
-from typing import List
+from collections import deque
+from typing import List, Dict
 '''
     https://softeer.ai/practice/7727
 
@@ -17,6 +18,12 @@ from typing import List
 
     예제 샘플은 맞지만 제출시 9개 오답
         -> 즉, 매 시기에 친구들이 정해진 순서로 최댓값을 찾는 동작 방식에 오류가 있을 것
+
+    * 이동 동작
+        1) 친구마다 3초안에 이동할 수 있는 모든 경로를 찾는다.
+        2) 그 이동경로에서 최대 값을 가지는 순서대로 가지치기를 한다.
+
+        -> 이 방법으로 바꾸고 난뒤 3번 오답, 12번 런타임 에러
 '''
 
 
@@ -32,100 +39,111 @@ for _ in range(M):
     f_inp = [x-1 for x in f_inp] # 인덱스화
     friends.append(f_inp)
 
-# visited = [ [False for _ in range(N)] for _ in range(N) ]
-friend_cur_pos = [ [False for _ in range(N)] for _ in range(N) ]
+# 현재 위치 마킹
+visited = [ [False for _ in range(N)] for _ in range(N) ]
+# for fi in friends:
+#     visited[fi[0]][fi[1]] = True
 
 dir_r = [-1, 1, 0, 0] # 상하좌우
 dir_c = [0, 0, -1, 1]
+max_val = 0
 
-max_val = -1
+# 친구별 경로리스트
+'''
+    '친구idx': {
+        'score': [ [x, y], ... ]
+    }
+'''
+route_infos: Dict[int, Dict[int, List[int]]] = {i: {} for i in range(M)}
 
-def is_move(
-    loc: List[int]
+# 모든 경로 탐색할 때 사용되는 변수
+fi_visited = []
+
+def is_move(x, y):
+    return (0 <= x < N and 0 <= y < N) and not fi_visited[x][y]
+
+def dfs(
+    idx: int, 
+    cur_pos: List[int],
+    cur_route: List[int],
+    cur_score: int,
+    cur_count: int,
 ):
-    # 격자 안이며, 친구와 겹치지 않음
-    return (0 <= loc[0] < N and 0 <= loc[1] < N) and (not friend_cur_pos[loc[0]][loc[1]])
-
-def bfs(
-    friends_locs: List[List[int]],
-    move_count,
-    cur_score,
-):
-    global max_val
-
-    # 최대 3번만 이동하므로
-    if move_count >= 3:
-        max_val = cur_score if cur_score > max_val else max_val
+    if 3 <= cur_count:
+        # 현재 경로 저장
+        route_infos[idx].update({cur_score: cur_route})
         return
-    
-    # print(f"move_count: {move_count}, cur_score: {cur_score}")
-    # for ii in friends_locs:
-    #     print(f"{ii}: {field_arr[ii[0]][ii[1]]}")
 
-    next_move_infos: List[int] = []
-    for f_loc in friends_locs:
-        f_next_dir_idx = -1
-        f_next_max_score = -1
-
-        for di in range(4): # 4방향 확인
-            # 친구들 마다 움직이게 함
-            # 친구들은 같은 시간에 움직임
-            # 방향을 탐색하는 조건은 없을까?
-            #   - 매번 최대의 선택을 하게 하자
-
-            # 다음 이동하는 곳
-            next_r = f_loc[0] + dir_r[di]
-            next_c = f_loc[1] + dir_c[di]
-            # print(f"{next_r}, {next_c}")
-            
-            # 움직일 수 있는가?
-            if not is_move([next_r, next_c]):
-                continue
-
-            # 다음 점수는 몇 점인가?
-            next_score = field_arr[next_r][next_c]
-            # print(f"{next_r}, {next_c} -> {next_score}")
-            if f_next_max_score < next_score:
-                f_next_dir_idx = di
-                f_next_max_score = next_score
+    for di in range(4):
+        next_r = cur_pos[0] + dir_r[di]
+        next_c = cur_pos[1] + dir_c[di]
         
-        # 다음 이동할 목록 만들기
-        if -1 == f_next_dir_idx:
-            # 이동 못함
-            next_move_infos.append(f_loc)
-        else:
-            next_r = f_loc[0] + dir_r[f_next_dir_idx]
-            next_c = f_loc[1] + dir_c[f_next_dir_idx]
-            
-            friend_cur_pos[next_r][next_c] = True
-            next_move_infos.append([
-                next_r,
-                next_c,
-            ])
+        if not is_move(next_r, next_c):
+            continue
+        
+        fi_visited[next_r][next_c] = True
+        new_route = copy.deepcopy(cur_route)
+        new_route.append([next_r, next_c]) 
+        dfs(
+            idx=idx,
+            cur_pos=[next_r, next_c],
+            cur_route=new_route,
+            cur_score=cur_score + field_arr[next_r][next_c],
+            cur_count=cur_count + 1,
+        )
+        fi_visited[next_r][next_c] = False
+    
+# 모든 친구들의 경로를 계산
+for fi_idx, fi_item in enumerate(friends):
+    fi_visited =[ [False for _ in range(N)] for _ in range(N) ]
+    fi_visited[fi_item[0]][fi_item[1]] = True
 
-    # 다음 단계로 진행
-    # 더애지는 스코어
-    add_score = sum([field_arr[r][c] for r,c in next_move_infos])
-    bfs(
-        friends_locs=next_move_infos,
-        move_count=move_count+1,
-        cur_score=cur_score+add_score
+    dfs(
+        idx=fi_idx,
+        cur_pos=fi_item,
+        cur_route=[fi_item],
+        cur_score=field_arr[fi_item[0]][fi_item[1]],
+        cur_count=0,
     )
 
-    # 방문 해제
-    for mv_info in next_move_infos:
-        friend_cur_pos[mv_info[0]][mv_info[1]] = False
+# 경로에서 최고 점수를 찾아냄
+'''
+4 2
+20 26 185 80
+100 20 25 80
+20 20 88 99
+15 32 44 50
+1 2
+2 3
+'''
+fixed_route = []
+friend_que = deque([i for i in range(M)])
+while len(fixed_route) != M:
+    cur_max_fdx = -1
+    cur_max_score = -1
     
-### MAIN ###
-# 현재 친구의 위치는 방문하지 않도록 함
-for fr in friends:
-    friend_cur_pos[fr[0]][fr[1]] = True
+    for fidx in range(M):
+        if fidx in fixed_route:
+            continue
+        
+        fi_routes = list(route_infos[fidx].keys())
+        fi_routes.sort(reverse=True)
 
-cur_score = sum([field_arr[r][c] for r, c in friends])
-bfs(
-    friends_locs=friends,
-    move_count=0,
-    cur_score=cur_score
-)
+        for route_score in fi_routes:
+            if route_score > cur_max_score:
+                is_used_route = False
+                for route in route_infos[fidx][route_score]:
+                    if visited[route[0]][route[1]]:
+                        is_used_route = True
+                        break
+                if not is_used_route:
+                    cur_max_fdx = fidx
+                    cur_max_score = route_score
+    
+    # 최선의 경로 확정
+    fixed_route.append(cur_max_fdx)
+    max_val += cur_max_score
+    for r,c in route_infos[cur_max_fdx][cur_max_score]:
+        visited[r][c] = True                
 
 print(max_val)
