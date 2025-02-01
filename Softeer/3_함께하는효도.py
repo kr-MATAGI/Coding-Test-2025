@@ -41,12 +41,9 @@ for _ in range(M):
 
 # 현재 위치 마킹
 visited = [ [False for _ in range(N)] for _ in range(N) ]
-# for fi in friends:
-#     visited[fi[0]][fi[1]] = True
 
 dir_r = [-1, 1, 0, 0] # 상하좌우
 dir_c = [0, 0, -1, 1]
-max_val = 0
 
 # 친구별 경로리스트
 '''
@@ -115,7 +112,16 @@ for fi_idx, fi_item in enumerate(friends):
 15 32 44 50
 1 2
 2 3
+
+처음 친구들의 위치를 표시안해도 될까?
+-> 런타임 에러는 아마 Key Error: -1로 생각됨 -> 최적의 경로가 없는 경우
+-> 오답은 뭘까>
+
 '''
+for ff in friends:
+    visited[ff[0]][ff[1]] = True
+
+max_val = 0
 fixed_route = []
 friend_que = deque([i for i in range(M)])
 while len(fixed_route) != M:
@@ -133,6 +139,8 @@ while len(fixed_route) != M:
             if route_score > cur_max_score:
                 is_used_route = False
                 for route in route_infos[fidx][route_score]:
+                    if route[0] == friends[fidx][0] and route[1] == friends[fidx][1]:
+                        continue
                     if visited[route[0]][route[1]]:
                         is_used_route = True
                         break
