@@ -1,6 +1,6 @@
 import copy
 from collections import deque
-from typing import List, Dict
+from typing import List, Dict, Any
 '''
     https://softeer.ai/practice/7727
 
@@ -47,11 +47,13 @@ dir_c = [0, 0, -1, 1]
 
 # 친구별 경로리스트
 '''
-    '친구idx': {
-        'score': [ [x, y], ... ]
-    }
+    '친구idx': [
+        [score, [x, y], ... ],
+        ....
+    ]
+        
 '''
-route_infos: Dict[int, Dict[int, List[int]]] = {i: {} for i in range(M)}
+route_infos: Dict[int, List[Any]] = {i: [] for i in range(M)}
 
 # 모든 경로 탐색할 때 사용되는 변수
 fi_visited = []
@@ -68,7 +70,7 @@ def dfs(
 ):
     if 3 <= cur_count:
         # 현재 경로 저장
-        route_infos[idx].update({cur_score: cur_route})
+        route_infos[idx].append([cur_score, cur_route])
         return
 
     for di in range(4):
@@ -92,7 +94,7 @@ def dfs(
     
 # 모든 친구들의 경로를 계산
 for fi_idx, fi_item in enumerate(friends):
-    fi_visited =[ [False for _ in range(N)] for _ in range(N) ]
+    fi_visited = [ [False for _ in range(N)] for _ in range(N) ]    
     fi_visited[fi_item[0]][fi_item[1]] = True
 
     dfs(
@@ -103,6 +105,8 @@ for fi_idx, fi_item in enumerate(friends):
         cur_count=0,
     )
 
+# print(route_infos)
+
 # 경로에서 최고 점수를 찾아냄
 '''
 4 2
@@ -112,6 +116,15 @@ for fi_idx, fi_item in enumerate(friends):
 15 32 44 50
 1 2
 2 3
+
+4 2
+1 1 1 1
+1 1 1 1
+1 1 1 1
+1 1 1 1
+1 2
+2 3
+
 
 처음 친구들의 위치를 표시안해도 될까?
 -> 런타임 에러는 아마 Key Error: -1로 생각됨 -> 최적의 경로가 없는 경우
@@ -124,21 +137,23 @@ for ff in friends:
 max_val = 0
 fixed_route = []
 friend_que = deque([i for i in range(M)])
+
+# for k, v in route_infos.items():
+#     print(f"{k}: {v}")
+
 while len(fixed_route) != M:
     cur_max_fdx = -1
     cur_max_score = -1
+    cur_max_routs = []
     
     for fidx in range(M):
         if fidx in fixed_route:
             continue
-        
-        fi_routes = list(route_infos[fidx].keys())
-        fi_routes.sort(reverse=True)
 
-        for route_score in fi_routes:
-            if route_score > cur_max_score:
+        for route_score, routes in route_infos[fidx]:
+            if (route_score > cur_max_score):# or (-1 == cur_max_fdx):
                 is_used_route = False
-                for route in route_infos[fidx][route_score]:
+                for route in routes:
                     if route[0] == friends[fidx][0] and route[1] == friends[fidx][1]:
                         continue
                     if visited[route[0]][route[1]]:
@@ -147,11 +162,12 @@ while len(fixed_route) != M:
                 if not is_used_route:
                     cur_max_fdx = fidx
                     cur_max_score = route_score
-    
+                    cur_max_routes = routes
+
     # 최선의 경로 확정
     fixed_route.append(cur_max_fdx)
     max_val += cur_max_score
-    for r,c in route_infos[cur_max_fdx][cur_max_score]:
-        visited[r][c] = True                
+    for r,c in cur_max_routes:
+        visited[r][c] = True
 
 print(max_val)
