@@ -24,6 +24,27 @@ from typing import List, Dict, Any
         2) 그 이동경로에서 최대 값을 가지는 순서대로 가지치기를 한다.
 
         -> 이 방법으로 바꾸고 난뒤 3번 오답, 12번 런타임 에러
+4 2
+20 26 185 80
+100 20 25 80
+20 20 88 99
+15 32 44 50
+1 2
+2 3
+
+4 2
+1 1 1 1
+1 1 1 1
+1 1 1 1
+1 1 1 1
+1 2
+2 3
+
+3 1
+1 100 1
+1 1 1
+1 100 1
+2 2
 '''
 
 
@@ -112,35 +133,6 @@ for fi_idx, fi_item in enumerate(friends):
 # print(route_infos)
 
 # 경로에서 최고 점수를 찾아냄
-'''
-4 2
-20 26 185 80
-100 20 25 80
-20 20 88 99
-15 32 44 50
-1 2
-2 3
-
-4 2
-1 1 1 1
-1 1 1 1
-1 1 1 1
-1 1 1 1
-1 2
-2 3
-
-3 1
-1 100 1
-1 1 1
-1 100 1
-2 2
-
-
-처음 친구들의 위치를 표시안해도 될까?
--> 런타임 에러는 아마 Key Error: -1로 생각됨 -> 최적의 경로가 없는 경우
--> 오답은 뭘까>
-
-'''
 for ff in friends:
     visited[ff[0]][ff[1]] = True
 
@@ -164,8 +156,8 @@ for human, sc_route in route_infos.items():
     all_routes.append(temp)
 
 best_score = 0
-for a in product(*all_routes):
-    best_score = max(best_score, get_routes_scores(a))
+for comb in product(*all_routes):
+    best_score = max(best_score, get_routes_scores(comb))
     # print(best_score)
 
 # print(max_val)
