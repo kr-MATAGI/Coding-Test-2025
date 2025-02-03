@@ -1,5 +1,5 @@
 import copy
-from collections import deque
+from itertools import product
 from typing import List, Dict, Any
 '''
     https://softeer.ai/practice/7727
@@ -59,7 +59,7 @@ route_infos: Dict[int, List[Any]] = {i: [] for i in range(M)}
 fi_visited = []
 
 def is_move(x, y):
-    return (0 <= x < N and 0 <= y < N) and not fi_visited[x][y]
+    return 0 <= x < N and 0 <= y < N
 
 def dfs(
     idx: int, 
@@ -80,14 +80,18 @@ def dfs(
         if not is_move(next_r, next_c):
             continue
         
+        add_score = field_arr[next_r][next_c]
+        if [next_r, next_c] in cur_route:
+            add_score = 0
+        
         fi_visited[next_r][next_c] = True
         new_route = copy.deepcopy(cur_route)
-        new_route.append([next_r, next_c]) 
+        new_route.append([next_r, next_c])
         dfs(
             idx=idx,
             cur_pos=[next_r, next_c],
             cur_route=new_route,
-            cur_score=cur_score + field_arr[next_r][next_c],
+            cur_score=cur_score + add_score,
             cur_count=cur_count + 1,
         )
         fi_visited[next_r][next_c] = False
@@ -125,6 +129,12 @@ for fi_idx, fi_item in enumerate(friends):
 1 2
 2 3
 
+3 1
+1 100 1
+1 1 1
+1 100 1
+2 2
+
 
 처음 친구들의 위치를 표시안해도 될까?
 -> 런타임 에러는 아마 Key Error: -1로 생각됨 -> 최적의 경로가 없는 경우
@@ -134,40 +144,29 @@ for fi_idx, fi_item in enumerate(friends):
 for ff in friends:
     visited[ff[0]][ff[1]] = True
 
-max_val = 0
-fixed_route = []
-friend_que = deque([i for i in range(M)])
+def get_routes_scores(routes):
+    visited = [ [False for _ in range(N)] for _ in range(N) ]
+    ret_score = 0
 
-# for k, v in route_infos.items():
-#     print(f"{k}: {v}")
+    for route in routes:
+        for pos in route:
+            if not visited[pos[0]][pos[1]]:
+                ret_score += field_arr[pos[0]][pos[1]]
+            visited[pos[0]][pos[1]] = True
+            
+    return ret_score
 
-while len(fixed_route) != M:
-    cur_max_fdx = -1
-    cur_max_score = -1
-    cur_max_routs = []
-    
-    for fidx in range(M):
-        if fidx in fixed_route:
-            continue
+all_routes = [] 
+for human, sc_route in route_infos.items():
+    temp = []
+    for sc, ru in sc_route:
+        temp.append([tuple(x) for x in ru])
+    all_routes.append(temp)
 
-        for route_score, routes in route_infos[fidx]:
-            if (route_score > cur_max_score):# or (-1 == cur_max_fdx):
-                is_used_route = False
-                for route in routes:
-                    if route[0] == friends[fidx][0] and route[1] == friends[fidx][1]:
-                        continue
-                    if visited[route[0]][route[1]]:
-                        is_used_route = True
-                        break
-                if not is_used_route:
-                    cur_max_fdx = fidx
-                    cur_max_score = route_score
-                    cur_max_routes = routes
+best_score = 0
+for a in product(*all_routes):
+    best_score = max(best_score, get_routes_scores(a))
+    # print(best_score)
 
-    # 최선의 경로 확정
-    fixed_route.append(cur_max_fdx)
-    max_val += cur_max_score
-    for r,c in cur_max_routes:
-        visited[r][c] = True
-
-print(max_val)
+# print(max_val)
+print(best_score)
