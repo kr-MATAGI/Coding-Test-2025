@@ -24,11 +24,13 @@
                 100,000 * 99,999 
         
         FPFPFP
-            FPF, PFP, FPF, PFP
+            FPF, PFP, FPF, PFP, FPFPFP
     2)
-        이분법 활용하면 될 거 같음
+        계속해서 하나씩 윈도우 옮기면서 누적합을 이용?
+    
+    3)
+        DP
 '''
-
 
 import sys
 import copy
@@ -38,42 +40,32 @@ from typing import List, Any, Dict
 N = int(sys.stdin.readline().strip())
 road_infos = list(str(sys.stdin.readline().strip()))
 
-count_info: Dict[str, int] = {
-    "T": 0, # 나무
-    "G": 0, # 잔디
-    "F": 0, # 울타리
-    "P": 0, # 사람
-}
+DP = [ [ [ [0 for _ in range(3)] for _ in range(3) ] for _ in range(3) ] for _ in range(3) ]
 
-# 함수
-
-
-# 계산
 answer = 0
+t_cnt = 0
+g_cnt = 0
+f_cnt = 0
+p_cnt = 0
 
-window_size = 3
-while window_size <= N:
-    for i in range(N):
-        if i + window_size > N:
-            break
-        
-        new_count_info = copy.deepcopy(count_info)
-        window_slice = road_infos[i:i+window_size]
-        # print(window_slice)
-        for w in window_slice:
-            new_count_info[w] += 1
-        # print(new_count_info)
+DP[0][0][0][0] = 1
+for item in road_infos:
+    if 'T' == item:
+        t_cnt = (t_cnt + 1) % 3
+    elif 'G' == item:
+        g_cnt = (g_cnt + 1) % 3
+    elif 'F' == item:
+        f_cnt = (f_cnt + 1) % 3
+    elif 'P' == item:
+        p_cnt = (p_cnt + 1) % 3
+    
+    answer += DP[t_cnt][g_cnt][f_cnt][p_cnt]
+    DP[t_cnt][g_cnt][f_cnt][p_cnt] += 1
 
-        is_existing = True
-        for k, v in new_count_info.items():
-            if 0 != v and 0 != v % 3:
-                is_existing = False
-                break
-        
-        if is_existing:
-            answer += 1
-
-    window_size += 3
-
-# 출력
+# print(f"""
+# T: {t_cnt}\n
+# G: {g_cnt}\n
+# F: {f_cnt}\n
+# P: {p_cnt}\n
+# """)
 print(answer)
