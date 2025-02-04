@@ -5,6 +5,7 @@
     - TODO:
         - 1004_어린왕자
         - 1013_Contact
+        - 31091_거짓말
 
 - Softeer (난이도 3~4)
     - https://softeer.ai/practice?difficulty=LV_3%2CLV_4&page=0
