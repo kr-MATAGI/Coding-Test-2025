@@ -33,6 +33,8 @@ ehwang -> 1
 
     2)
         - 알파벳 개수 (26) * 문자열 길이 (200,000)
+        -> 1번 방법에 비해 메모리랑 속도 3배 감소 확인
+        -> but, 최악은 200,000 * 200,000 임
 
 
 * 부분점수
@@ -42,34 +44,69 @@ ehwang -> 1
 MAX_S = 200000 # 200,000
 MAX_Q = 200000 # 200,000
 
+import sys
+input = sys.stdin.readline
 
 # 입력
-S = list(str(input()))
-Q = int(input())
-
-q_list = []
-for _ in range(Q):
-    a, l, r = map(str, input().split())
-    l = int(l)
-    r = int(r)
-    q_list.append((a, l, r))
+S = list(str(input().strip()))
+Q = int(input().strip())
 
 # 계산
-calc_arr = [ [] for _ in range(26) ] # 알파벳: [] -> 정보 저장
+calc_arr = [ [0 for _ in range(26)] for _ in range(len(S) + 1) ] # 알파벳 * 문자열 길이
 
 minus_alpha_val = ord('a')
 for sdx, s_char in enumerate(S):
     char2int = ord(s_char.lower()) - minus_alpha_val
 
-    calc_arr[char2int].append(sdx)
+    if 0 < sdx:
+        for i in range(26):
+            calc_arr[sdx][i] = calc_arr[sdx-1][i]
+
+    calc_arr[sdx][char2int] += 1
 
 # 출력
-for a, b, c in q_list:
-    its_me = calc_arr[ord(a) - minus_alpha_val]
+for _ in range(Q):
+    a, l, r = map(str, input().strip().split())
+    l = int(l)
+    r = int(r)
 
-    answer = 0
-    for i in its_me:
-        if b <= i <= c:
-            answer += 1
+    char2int = ord(a) - minus_alpha_val
+    if 0 == l:
+        # 최대값을 출력하면 됨
+        # answers.append(str(calc_arr[r][char2int]))
+        print(calc_arr[r][char2int])
+    else:
+        # calc_arr[char2int][c] : 0번째부터 c까지 총 등장 수
+        # calc_arr[char2int][b - 1]: 0번째부터 b 직전까지의 등장 수
+        # 두 개의 차는 곧 b ~ c 까지의 등장 횟수
+        answer = calc_arr[r][char2int] - calc_arr[l-1][char2int]
+        # answers.append(str(answer))
+        print(answer)
+
+
+##### 아래는 이분 탐색 사용하는 코드
+
+import sys
+import bisect
+
+input = sys.stdin.readline
+S = input().strip()
+Q = int(input().strip())
+
+# 각 알파벳(0~25)에 대해 등장하는 인덱스를 저장합니다.
+positions = [[] for _ in range(26)]
+for i, ch in enumerate(S):
+    positions[ord(ch) - ord('a')].append(i)
+
+# 질의 처리
+for _ in range(Q):
+    letter, l, r = input().split()
+    l = int(l)
+    r = int(r)
+    idx = ord(letter) - ord('a')
     
-    print(answer)
+    # positions[idx]에서 l 이상의 첫 인덱스와 r를 초과하는 첫 인덱스를 찾습니다.
+    left = bisect.bisect_left(positions[idx], l)
+    right = bisect.bisect_right(positions[idx], r)
+    # 두 인덱스의 차이가 구간 내 등장 횟수입니다.
+    sys.stdout.write(str(right - left) + "\n")
