@@ -27,8 +27,16 @@ aehwang -> 2
 ehwang -> 1
 
 * 풀이 방법
-    - 문자열 길이 (2,000) * 알파벳 개수(26) 의 2차원 배열을 만든다.
+    1)
+        - 문자열 길이 (200,000) * 알파벳 개수(26) 의 2차원 배열을 만든다.
+        - 먼저 정보들을 만들어 놓는게 유리
 
+    2)
+        - 알파벳 개수 (26) * 문자열 길이 (200,000)
+
+
+* 부분점수
+    - 그저 list slice 사용하면 효율이 없음
 """
 
 MAX_S = 200000 # 200,000
@@ -47,29 +55,21 @@ for _ in range(Q):
     q_list.append((a, l, r))
 
 # 계산
-calc_arr = [ [0 for _ in range(26)] for _ in range (MAX_S) ] # 문자열 * 알파벳
+calc_arr = [ [] for _ in range(26) ] # 알파벳: [] -> 정보 저장
 
 minus_alpha_val = ord('a')
 for sdx, s_char in enumerate(S):
-    # 이전 값 업데이트
-    # for adx in range(26):
-    #     calc_arr[sdx][adx] = calc_arr[sdx-1][adx]
-
-    # 현재 값 업데이트
     char2int = ord(s_char.lower()) - minus_alpha_val
-    calc_arr[sdx][char2int] = 1
 
-    # print(char2int, s_char, calc_arr[sdx][char2int])
-
+    calc_arr[char2int].append(sdx)
 
 # 출력
 for a, b, c in q_list:
-    char2int = ord(a) - minus_alpha_val
+    its_me = calc_arr[ord(a) - minus_alpha_val]
+
+    answer = 0
+    for i in its_me:
+        if b <= i <= c:
+            answer += 1
     
-    slice_vals = calc_arr[b:c+1]
-    slice_vals = [x[char2int] for x in slice_vals]
-    # print(slice_vals)
-    
-    # answer = calc_arr[c][char2int] - calc_arr[b][char2int]
-    answer = sum(slice_vals)
     print(answer)
