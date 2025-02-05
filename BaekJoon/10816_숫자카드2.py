@@ -4,6 +4,8 @@
     정수 M개가 주어졌을 때, 이 수가 적혀있는 숫자 카드를 상근이가 몇 개 가지고 있는지 구하는 프로그램
 """
 
+from collections import Counter
+
 # 입력 처리
 N = int(input()) # N은 500,000
 n_list = list(map(int, input().split()))
@@ -38,19 +40,11 @@ answers = []
 1
 3
 '''
-n_list.sort()
-n_counts = {}
-for n_item in n_list:
-    if n_item in n_counts.keys():
-        n_counts[n_item] += 1
-    else:
-        n_counts[n_item] = 1
+
+count_infos = Counter(n_list)
 
 for m_item in m_list:
-    if m_item in n_counts.keys():
-        answers.append(n_counts[m_item])
-    else:
-        answers.append(0)
+    answers.append(count_infos[m_item])
 
 # 출력
 print(" ".join([str(x) for x in answers]))
