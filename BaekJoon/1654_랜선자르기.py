@@ -17,6 +17,12 @@
 457
 539
 
+4 1
+800
+700
+400
+500
+
 802 -> 4개
 743 -> 3개
 457 -> 2개
@@ -45,17 +51,18 @@ while low <= high:
     
     lan_cable_slice_val = sum([x // mid for x in lan_lines])
     
-    if N == lan_cable_slice_val:
+    if N <= lan_cable_slice_val:
         ans = mid
         low = mid + 1
         
-    elif N < lan_cable_slice_val:
-        low = mid + 1
+    # elif N < lan_cable_slice_val:
+    #     low = mid + 1
     
     else:
         high = mid - 1
 
-# print(low, high)
+# print('----\n')
+# print(optim_lan_len)
 
 # 출력
 print(ans)
