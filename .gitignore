@@ -30,3 +30,7 @@ working/
 __pycache__/
 *.py[cod]
 *$py.class
+
+
+### Node.js ###
+docker/node_modules
