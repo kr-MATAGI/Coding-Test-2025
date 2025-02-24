@@ -11,6 +11,12 @@ services:
       - 8080:8080
     networks:
       - mynet1
+    depends_on:
+      - nginx-server
+    deploy:
+      mode: replicated
+      replicas: 3
+
   db-container:
     image: postgres:13.20-alpine3.20
     ports:
@@ -18,8 +24,8 @@ services:
     networks:
       - mynet1
     environment:
-      - POSTGRES_USER=admin
-      - POSTGRES_PASSWORD=qwer1234
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
       - type: volume
         source: test
