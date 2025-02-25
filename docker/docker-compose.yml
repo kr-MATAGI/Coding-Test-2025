@@ -1,21 +1,33 @@
 services:
-  nginx-server:
-    image: nginx:1
-    ports:
-      - 80:80
-    networks:
-      - mynet1
   web-server:
-    image: matagi1209/docker-temp:1
+    image: node:hydrogen-alpine3.21
     ports:
       - 8080:8080
     networks:
       - mynet1
-    depends_on:
-      - nginx-server
-    deploy:
-      mode: replicated
-      replicas: 3
+    # deploy:
+    #   mode: replicated
+    #   replicas: 3
+    restart: always
+    build: .
+    develop:
+      watch:
+        - action: sync+restart # 내 컴퓨터의 코드가 변경사항이 생기면 반영
+          path: .
+          target: /app # 컨테이너 안에 있는 폴더에 복붙
+
+        - action: rebuild
+          path: package.json # 해당 경로 변동사항 발생시 rebuild  
+  
+  # nginx-server:
+  #   image: nginx:1
+  #   ports:
+  #     - 80:80
+  #   networks:
+  #     - mynet1
+  #   # depends_on:
+  #   #   - web-server
+  #   # restart: always
 
   db-container:
     image: postgres:13.20-alpine3.20
@@ -27,12 +39,12 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
-      - type: volume
-        source: test
-        target: /var/lib/postgresql/data
-  
+      - test:/var/lib/postgresql/data
+    # restart: always
+
 volumes:
-  test: {}
+  test:
+    external: true
 
 networks:
   mynet1:
