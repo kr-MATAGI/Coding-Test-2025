@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 
 from sklearn.linear_model import LinearRegression, LogisticRegression
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import RandomForestClassifier
 
 # Load Data
 train_df = pd.read_csv("./sweet_pee/sweet_pee_train.csv")
@@ -30,12 +30,12 @@ print(x_train.isnull().sum())
 print(x_test.isnull().sum())
 
 # Model
-model = LogisticRegression()
+model = RandomForestClassifier()
 model.fit(x_train, y_train)
 
 # Valid
 print(model.score(x_train, y_train))
-
+print(model.score(x_test, y_test))
 
 # Prediction
 preds = model.predict(x_test)
@@ -46,3 +46,4 @@ preds_df = pd.DataFrame({
 
 preds_df.loc[:, "당뇨여부"] = np.where(preds_df["당뇨여부"] >= 0.5, "당뇨", "정상")
 print(preds_df)
+
