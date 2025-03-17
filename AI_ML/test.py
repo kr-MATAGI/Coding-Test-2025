@@ -11,3 +11,24 @@ df.columns = ['이름', '속성','색깔','순위']
 print(df)
 
 
+print('--------------------')
+print(df.iloc[0])
+print()
+print(df.iloc[[0]])
+print()
+print(df[0:1])
+
+print('--------------------')
+print(df.iloc[2:4])
+
+print('--------------------')
+print(df.iloc[2:5,1:3])
+
+
+print('--------------------')
+# df.loc['피카츄', '색깔']='노랑검정'
+df['공격력'] = [15, 20, 9, 30, 16, 18 ]
+print(df.isnull().sum())
+
+
+print(df.groupby('순위').mean())
