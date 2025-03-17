@@ -1,5 +1,7 @@
 import pandas as pd
 import numpy as np
+
+from xgboost import XGBRegressor
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
@@ -50,10 +52,10 @@ best_params = grid_search.best_params_
 print(f"Optim Hyperparameter:\n{best_params}")
 
 # Model
-model = RandomForestRegressor(
-    n_estimators=best_params['n_estimators'],
-    max_depth=best_params['max_depth'],
-    min_samples_split=best_params['min_samples_split']
+model = XGBRegressor(
+    # n_estimators=best_params['n_estimators'],
+    # max_depth=best_params['max_depth'],
+    # min_samples_split=best_params['min_samples_split']
 )
 model.fit(x_train, y_train)
 
