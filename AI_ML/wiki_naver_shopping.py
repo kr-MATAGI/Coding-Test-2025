@@ -2,7 +2,8 @@ import pandas as pd
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.linear_model import LinearRegression
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
+from sklearn.model_selection import GridSearchCV
 
 # Load Data
 train_df = pd.read_csv("./naver_shopping/naver_shopping_train.csv")
@@ -30,8 +31,30 @@ print(x_train.shape)
 # print(x_train.isnull().sum())
 # print(x_test.isnull().sum())
 
+# Hyperparameter
+param_grid = {
+    'n_estimators': [100, 200, 300], # 트리 개수
+    'max_depth': [10, 15, 20], # 트리 최대 깊이
+    'min_samples_split': [2, 5, 10] # 노드를 나누는 최소 샘플 수
+}
+
+grid_search = GridSearchCV(
+    RandomForestRegressor(random_state=42), 
+    param_grid=param_grid,
+    cv=5,  # 5-Fold 교차 검증
+    scoring='r2', # R^2 점수 기준 최적화
+    n_jobs=-1 # 모든 CPU 코어 사용
+)
+grid_search.fit(x_train, y_train)
+best_params = grid_search.best_params_
+print(f"Optim Hyperparameter:\n{best_params}")
+
 # Model
-model = RandomForestRegressor()
+model = RandomForestRegressor(
+    n_estimators=best_params['n_estimators'],
+    max_depth=best_params['max_depth'],
+    min_samples_split=best_params['min_samples_split']
+)
 model.fit(x_train, y_train)
 
 # Valid
