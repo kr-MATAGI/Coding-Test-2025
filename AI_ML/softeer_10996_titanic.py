@@ -67,7 +67,10 @@ print(x_test.isnull().sum())
 
 # OneHot
 transformer = make_column_transformer(
-    (OneHotEncoder(handle_unknown='ignore', sparse_output=False), ['Sex', "Cabin", "Embarked"]),
+    (
+        OneHotEncoder(handle_unknown='ignore', sparse_output=False),
+        ['Sex', "Cabin", "Embarked"]
+    ),
     remainder='passthrough'
 )
 pipeline = make_pipeline(transformer, MinMaxScaler())
