@@ -40,6 +40,7 @@ label_enc = LabelEncoder()
 label_enc.fit(y_data)
 y_data = label_enc.transform(y_data)
 
+
 # Split Train / Test
 train_x, test_x, train_y, test_y = train_test_split(
     x_data, y_data, test_size=0.2, random_state=42, stratify=y_data
