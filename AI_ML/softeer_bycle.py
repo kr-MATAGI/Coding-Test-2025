@@ -26,17 +26,24 @@ train_df = pd.read_csv("./bycle/train.csv")
 test_df = pd.read_csv("./bycle/test.csv")
 
 # Shuffle
-train_df = train_df.sample(frac=1).reset_index(drop=True)
+# train_df = train_df.sample(frac=1).reset_index(drop=True)
+
+# Sort
+train_df["datetime"] = pd.to_datetime(train_df["datetime"])
+test_df["datetime"] = pd.to_datetime(test_df["datetime"])
+
+train_df = train_df.sort_values(by="datetime")
+# test_df = test_df.sort_values(by="datetime")
+# print(train_df.head())
 
 # Split datetime
-train_df["datetime"] = pd.to_datetime(train_df["datetime"])
 train_df["year"] = train_df["datetime"].dt.year
 train_df["month"] = train_df["datetime"].dt.month
 train_df["day"] = train_df["datetime"].dt.day
 train_df["hour"] = train_df["datetime"].dt.hour
 train_df["weekday"] = train_df["datetime"].dt.weekday
 
-test_df["datetime"] = pd.to_datetime(test_df["datetime"])
+
 test_df["year"] = test_df["datetime"].dt.year
 test_df["month"] = test_df["datetime"].dt.month
 test_df["day"] = test_df["datetime"].dt.day
@@ -116,7 +123,7 @@ print(f"train - x: {train_x.shape}, y: {train_y.shape}")
 # Model
 model = RandomForestRegressor(
     # random_state=42,
-    n_estimators=1000,
+    n_estimators=400,
     # **best_params
 )
 model.fit(
