@@ -41,22 +41,22 @@ test_data['pickup_datetime'] = pd.to_datetime(test_data['pickup_datetime'])
 train_data['dropoff_datetime'] = pd.to_datetime(train_data['dropoff_datetime'])
 
 # pickup
-train_data['pickup_year'] = train_data['pickup_datetime'].dt.year
-train_data['pickup_month'] = train_data['pickup_datetime'].dt.month
-train_data['pickup_day'] = train_data['pickup_datetime'].dt.day
+# train_data['pickup_year'] = train_data['pickup_datetime'].dt.year
+# train_data['pickup_month'] = train_data['pickup_datetime'].dt.month
+# train_data['pickup_day'] = train_data['pickup_datetime'].dt.day
 train_data['pickup_hour'] = train_data['pickup_datetime'].dt.hour
 train_data['pickup_minute'] = train_data['pickup_datetime'].dt.minute
 
-test_data['pickup_year'] = test_data['pickup_datetime'].dt.year
-test_data['pickup_month'] = test_data['pickup_datetime'].dt.month
-test_data['pickup_day'] = test_data['pickup_datetime'].dt.day
+# test_data['pickup_year'] = test_data['pickup_datetime'].dt.year
+# test_data['pickup_month'] = test_data['pickup_datetime'].dt.month
+# test_data['pickup_day'] = test_data['pickup_datetime'].dt.day
 test_data['pickup_hour'] = test_data['pickup_datetime'].dt.hour
 test_data['pickup_minute'] = test_data['pickup_datetime'].dt.minute
 
 # dropoff
-train_data['dropoff_year'] = train_data["dropoff_datetime"].dt.year
-train_data["dropoff_month"] = train_data["dropoff_datetime"].dt.month
-train_data["dropoff_day"] = train_data["dropoff_datetime"].dt.day
+# train_data['dropoff_year'] = train_data["dropoff_datetime"].dt.year
+# train_data["dropoff_month"] = train_data["dropoff_datetime"].dt.month
+# train_data["dropoff_day"] = train_data["dropoff_datetime"].dt.day
 train_data["dropoff_hour"] = train_data["dropoff_datetime"].dt.hour
 train_data["dropoff_minute"] = train_data["dropoff_datetime"].dt.minute
 
@@ -74,7 +74,7 @@ test -
 
 # Split X, y
 target_feature = [
-    "dropoff_year", "dropoff_month", "dropoff_day",
+    #"dropoff_year", "dropoff_month", "dropoff_day",
     "dropoff_hour", "dropoff_minute",
     "trip_duration"
 ]
@@ -83,7 +83,7 @@ train_y = train_data["trip_duration"]
 
 # OneHot Encoding
 onehot_enc = make_column_transformer(
-    (OneHotEncoder(sparse_output=False, handle_unknown="ignore"), ["store_and_fwd_flag"]),
+    (OneHotEncoder(sparse_output=True, handle_unknown="ignore"), ["store_and_fwd_flag"]),
     remainder="passthrough"
 )
 onehot_enc.fit(train_x)
