@@ -69,14 +69,20 @@ def solution(diffs, times, limit):
     ret_val = 0
 
     # Calc
-    max_val = max(diffs)
-    min_val = min(diffs)
+    
+    if 1 < len(diffs):
+        max_val = max(diffs)
+        min_val = min(diffs)
+    else:
+        max_val = max(diffs) + 1
+        min_val = max(diffs)
     
     all_levels = []
     while True:
         mid_val = (max_val + min_val) // 2
+        print(mid_val)
         
-        if mid_val == max_val or min_val == mid_val:
+        if mid_val in [max_val, min_val]:
             break
         
         total_time = 0
@@ -97,8 +103,12 @@ def solution(diffs, times, limit):
         else:
             all_levels.append(mid_val)
             max_val = mid_val
-                
-    ret_val = min(all_levels)
+    
+    if all_levels:
+        ret_val = min(all_levels)
+    else:
+        ret_val = diffs[0]
+
     return ret_val
 
 
@@ -127,7 +137,14 @@ if "__main__" == __name__:
         3456789012
     )
 
+    ans_5 = solution(
+        [10000, 9999],
+        [2, 1],
+        10001
+    )
+
     print(f"ans_1: {ans_1}")
     print(f"ans_2: {ans_2}")
     print(f"ans_3: {ans_3}")
     print(f"ans_4: {ans_4}")
+    print(f"ans_5: {ans_5}")
