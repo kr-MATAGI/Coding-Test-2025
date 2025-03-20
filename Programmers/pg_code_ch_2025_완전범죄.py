@@ -26,47 +26,41 @@
 def solution(info, n, m):
     # Init
     answer = -1
-    info_size = len(info)
-    
+
+    LEN = len(info)    
     INF = float('inf')
-    DP = [INF] * n # dp[i]는 A 흔적 합이 x일 때, b 흔적 합의 최소값
-    DP[0] = 0
+    # dp[i][b] = i 아이템에서 B의 누적 흔적이 b일 때, A의 최소 누적 흔적
+    DP = [[INF] * m for _ in range(LEN + 1)]
+    DP[0][0] = 0
 
     # Calc
-    for i in range(info_size):
-        a_cost = info[i][0]
-        b_cost = info[i][1]
+    for i in range(LEN):
+        a_cost, b_cost = info[i]
+        
+        for b in range(m):
+            if DP[i][b] == INF:
+                continue
 
-        new_dp = [INF] * n
-        for a_trace in range(n):
-            if DP[a_trace] == INF:
-                continue # 현재 상태가 유효하지 않음
-                
-            b_trace = DP[a_trace]
+            # A가 i를 훔침
+            a_steal = a_cost + DP[i][b]
+            if a_steal < n:
+                DP[i + 1][b] = min(DP[i + 1][b], a_steal)
             
-            # 물건 i를 A 가 훔침
-            new_a = a_trace + a_cost
-            if new_a < n:
-                new_dp[new_a] = min(new_dp[new_a], b_trace)
-
-            # 물건 i를 b가 훔침
-            new_b = b_trace + b_cost
-            if new_b < m:
-                new_dp[a_trace] = min(new_dp[a_trace], new_b)
-        DP = new_dp
-    
-    # 모든 물건 처리가 끝난 뒤,
-    # dp[x] != INF 이고 dp[x] < m 인 x 중 최솟값을 찾는다.
-    answer = min([x for x in range(n) if DP[x] < m], default=INF)
+            # B가 i를 훔침
+            b_steal = b + b_cost
+            if b_steal < m:
+                DP[i + 1][b_steal] = min(DP[i + 1][b_steal], DP[i][b])
+            
+    answer = min(DP[LEN])
     return answer if answer != INF else -1
 
 ### MAIN ###
 if "__main__" == __name__:
-    # ans_1 = solution(
-    #     [[1, 2], [2, 3], [2, 1]],
-    #     4, 4
-    # )
-    # print(ans_1)
+    ans_1 = solution(
+        [[1, 2], [2, 3], [2, 1]],
+        4, 4
+    )
+    print(ans_1)
 
     ans_2 = solution(
         [[3, 3], [3, 3]],
