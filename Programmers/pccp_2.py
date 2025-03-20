@@ -70,19 +70,15 @@ def solution(diffs, times, limit):
 
     # Calc
     
-    if 1 < len(diffs):
-        max_val = max(diffs)
-        min_val = min(diffs)
-    else:
-        max_val = max(diffs) + 1
-        min_val = max(diffs)
+    max_val = max(diffs) + 1
+    min_val = 1
     
     is_break = False
     all_levels = []
     while True:
         mid_val = (max_val + min_val) // 2
-        print(f"min: {min_val}, mid_val: {mid_val}, max: {max_val}")
-        if mid_val in [min_val]:
+        # print(f"min: {min_val}, mid_val: {mid_val}, max: {max_val}")
+        if mid_val == min_val:
             is_break = True
         
         total_time = 0
@@ -106,13 +102,13 @@ def solution(diffs, times, limit):
         
         if is_break:
             break
-
     
-    if all_levels:
-        ret_val = min(all_levels)
-    else:
-        ret_val = min(diffs)
-
+    ret_val = min(all_levels)
+    '''
+        테스트 7, 20에서 에러
+         -> 최대값 고려안되어 있어서 윗줄에 +1 했음
+    '''
+    
     return ret_val
 
 
@@ -148,9 +144,9 @@ if "__main__" == __name__:
     )
 
     ans_6 = solution(
-        [9999],
-        [1],
-        10001
+        [9999, 1, 1, 2],
+        [1, 1, 1, 2],
+        10010
     )
 
     print(f"ans_1: {ans_1}")
