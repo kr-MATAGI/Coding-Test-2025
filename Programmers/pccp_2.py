@@ -71,32 +71,34 @@ def solution(diffs, times, limit):
     # Calc
     max_val = max(diffs)
     min_val = min(diffs)
-    for cur_lvl in range(max_val, min_val - 1, -1):
-        is_include_limit = True
+    
+    all_levels = []
+    while True:
+        mid_val = (max_val + min_val) // 2
+        
+        if mid_val == max_val or min_val == mid_val:
+            break
+        
         total_time = 0
         for step, (cur_diff, cur_time) in enumerate(zip(diffs, times)):
-            if cur_diff <= cur_lvl: # 틀리지 않고 cur_time 만큼의 시간을 씀
+            if cur_diff <= mid_val: # 틀리지 않음
                 total_time += cur_time
             else:
-                wrong_cnt = cur_diff - cur_lvl
+                wrong_cont = cur_diff - mid_val
                 prev_time = 0
                 if 0 < step:
                     prev_time = times[step - 1]
-                spend_time = ((cur_time + prev_time) * wrong_cnt) + cur_time
+                spend_time = ((cur_time + prev_time) * wrong_cont) + cur_time
                 total_time += spend_time
         
-            # print(f"cur_lvl: {cur_lvl}, total_time: {total_time}, diff: {cur_diff}, time: {cur_time}, limit: {limit}\n")
-            
-            if total_time > limit: # 제한을 넘어섬
-                is_include_limit = False
-                break
-        
-        # 판별
-        if is_include_limit:
-            ret_val = cur_lvl
-        else: # 더 이상 작아지지 않음
-            break
-        
+        if total_time > limit:
+            # min 변경
+            min_val = mid_val
+        else:
+            all_levels.append(mid_val)
+            max_val = mid_val
+                
+    ret_val = min(all_levels)
     return ret_val
 
 
