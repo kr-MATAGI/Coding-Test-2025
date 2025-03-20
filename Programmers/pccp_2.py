@@ -77,13 +77,13 @@ def solution(diffs, times, limit):
         max_val = max(diffs) + 1
         min_val = max(diffs)
     
+    is_break = False
     all_levels = []
     while True:
         mid_val = (max_val + min_val) // 2
-        print(mid_val)
-        
-        if mid_val in [max_val, min_val]:
-            break
+        print(f"min: {min_val}, mid_val: {mid_val}, max: {max_val}")
+        if mid_val in [min_val]:
+            is_break = True
         
         total_time = 0
         for step, (cur_diff, cur_time) in enumerate(zip(diffs, times)):
@@ -103,11 +103,15 @@ def solution(diffs, times, limit):
         else:
             all_levels.append(mid_val)
             max_val = mid_val
+        
+        if is_break:
+            break
+
     
     if all_levels:
         ret_val = min(all_levels)
     else:
-        ret_val = diffs[0]
+        ret_val = min(diffs)
 
     return ret_val
 
@@ -138,8 +142,14 @@ if "__main__" == __name__:
     )
 
     ans_5 = solution(
-        [10000, 9999],
-        [2, 1],
+        [9999, 10000, 10001],
+        [2, 1, 3],
+        10001
+    )
+
+    ans_6 = solution(
+        [9999],
+        [1],
         10001
     )
 
@@ -148,3 +158,4 @@ if "__main__" == __name__:
     print(f"ans_3: {ans_3}")
     print(f"ans_4: {ans_4}")
     print(f"ans_5: {ans_5}")
+    print(f"ans_6: {ans_6}")
