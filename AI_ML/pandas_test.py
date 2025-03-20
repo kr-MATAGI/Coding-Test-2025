@@ -10,6 +10,7 @@ data = {
 }
 df = pd.DataFrame(data)
 
+
 # 데이터프레임 출력
 print(df)
 

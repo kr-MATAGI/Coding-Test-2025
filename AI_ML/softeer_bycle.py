@@ -3,8 +3,7 @@ import numpy as np
 
 from sklearn.metrics import mean_squared_log_error
 from sklearn.linear_model import LinearRegression
-from sklearn.preprocessing import RobustScaler
-from sklearn.metrics import mean_squared_log_error
+from sklearn.preprocessing import RobustScaler, MinMaxScaler
 from sklearn.ensemble import RandomForestRegressor, AdaBoostRegressor, GradientBoostingRegressor
 from sklearn.linear_model import Lasso
 from sklearn.model_selection import GridSearchCV
@@ -32,7 +31,7 @@ test_df = pd.read_csv("./bycle/test.csv")
 train_df["datetime"] = pd.to_datetime(train_df["datetime"])
 test_df["datetime"] = pd.to_datetime(test_df["datetime"])
 
-train_df = train_df.sort_values(by="datetime")
+train_df = train_df.sort_values(by="datetime", ascending=True)
 # test_df = test_df.sort_values(by="datetime")
 # print(train_df.head())
 
