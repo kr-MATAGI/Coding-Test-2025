@@ -25,17 +25,79 @@ https://school.programmers.co.kr/learn/courses/30/lessons/340212?language=python
 숙련도의 시작점은 어떻게 잡을 것인가?
 
 어떤 방법으로 해결할 것인가?
-    1) 단순 순회는 안됨 -> 시간 초과 가능
-    2) DFS, BFS 안됨 -> 시간 초과 가능
-    3) 
-'''
+    1) 단순 순회는 안됨 
+    2) DFS, BFS 안됨
 
+예1:
+    1, 5, 3     [2,4,7]     30
+    (1 ~ 5)
+    1) 5
+        2
+        4
+        7
+        = 13
+    
+    2) 4
+        2
+        (4 + 2) * 1 + 4 = 10
+        7
+        = 19
+    
+    3) 3
+        2
+        (4 + 2) * 2 + 4 = 16
+        7
+        = 25
+
+예2:
+    [1, 328, 467, 209, 54]
+    [2, 7, 1, 4, 3]
+    1723
+
+    1) 294
+        1 -> 2
+        328 -> (7+2) * 34 + 7 = 313
+        467 -> (1+7) * 173 + 1 = 1385
+        209 -> 4
+        54 -> 3
+
+'''
 def solution(diffs, times, limit):
     '''
         제한 시간 내에 퍼즐을 모두 해결하기 위한 숙련되의 최솟값
     '''
+    ret_val = 0
 
-
+    # Calc
+    max_val = max(diffs)
+    min_val = min(diffs)
+    for cur_lvl in range(max_val, min_val - 1, -1):
+        is_include_limit = True
+        total_time = 0
+        for step, (cur_diff, cur_time) in enumerate(zip(diffs, times)):
+            if cur_diff <= cur_lvl: # 틀리지 않고 cur_time 만큼의 시간을 씀
+                total_time += cur_time
+            else:
+                wrong_cnt = cur_diff - cur_lvl
+                prev_time = 0
+                if 0 < step:
+                    prev_time = times[step - 1]
+                spend_time = ((cur_time + prev_time) * wrong_cnt) + cur_time
+                total_time += spend_time
+        
+            # print(f"cur_lvl: {cur_lvl}, total_time: {total_time}, diff: {cur_diff}, time: {cur_time}, limit: {limit}\n")
+            
+            if total_time > limit: # 제한을 넘어섬
+                is_include_limit = False
+                break
+        
+        # 판별
+        if is_include_limit:
+            ret_val = cur_lvl
+        else: # 더 이상 작아지지 않음
+            break
+        
+    return ret_val
 
 
 if "__main__" == __name__:
@@ -57,8 +119,13 @@ if "__main__" == __name__:
         1723
     )
 
+    ans_4 = solution(
+        [1, 99999, 100000, 99995],
+        [9999, 9001, 9999, 9001],
+        3456789012
+    )
+
     print(f"ans_1: {ans_1}")
     print(f"ans_2: {ans_2}")
     print(f"ans_3: {ans_3}")
-
-
+    print(f"ans_4: {ans_4}")
