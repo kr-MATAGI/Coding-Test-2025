@@ -53,18 +53,22 @@ def solution(storage, requests):
         [False, False, False, False, False]
         [False, False, False, False, False]
     '''
+    
+    pos_infos = {}
     for rdx in range(row_len - 2):
         for cdx in range(col_len - 2):
             new_store[rdx+1][cdx+1] = storage[rdx][cdx]
             answer += 1
+            
+            if not new_store[rdx+1][cdx+1] in pos_infos.keys():
+                pos_infos[new_store[rdx+1][cdx+1]] = [(rdx+1, cdx+1)]
+            else:
+                pos_infos[new_store[rdx+1][cdx+1]].append((rdx+1, cdx+1))
+    
+    # for r, v in pos_infos.items():
+    #     print(r, v)
 
     # Calc
-    start_r = 1
-    start_c = 1
-    
-    end_r = row_len - 1
-    end_c = col_len - 1
-    
     def is_able_move_container(
         store, 
         cr, cc,
@@ -105,37 +109,48 @@ def solution(storage, requests):
     
     for req_item in requests:
         remove_items = []
+        
+        target_ch = ""
         if 1 == len(req_item):
+            if not req_item in pos_infos.keys():
+                continue
+            
+            target_ch = req_item
             # 지게차 사용
-            for r in range(start_r, end_r):
-                for c in range(start_c, end_c):
-                    if req_item == new_store[r][c]:
-                        visited[r][c] = True
-                        is_moving = is_able_move_container(
-                            new_store,
-                            r, c,
-                            visited
-                        )
-                        visited[r][c] = False
-                        # print(f"[{r},{c}] - {new_store[r][c]}, {is_moving}\n")
+            for r, c in pos_infos[req_item]:
+                if req_item == new_store[r][c]:
+                    visited[r][c] = True
+                    is_moving = is_able_move_container(
+                        new_store,
+                        r, c,
+                        visited
+                    )
+                    visited[r][c] = False
+                    # print(f"[{r},{c}] - {new_store[r][c]}, {is_moving}\n")
                         
-                        if is_moving:
-                            remove_items.append((r,c)) # 컨테이너를 뺌
-                            answer -= 1
-        else:
-            # 크레인 사용
-            for r in range(start_r, end_r):
-                for c in range(start_c, end_c):
-                    if req_item[0] == new_store[r][c]:
+                    if is_moving:
                         remove_items.append((r,c)) # 컨테이너를 뺌
                         answer -= 1
+                    
+        else:
+            if not req_item[0] in pos_infos.keys():
+                continue
+
+            target_ch = req_item[0]
+            # 크레인 사용
+            for r, c in pos_infos[req_item[0]]:
+                remove_items.append((r,c)) # 컨테이너를 뺌
+                answer -= 1            
+                        
 
         # 뺀 컨테이너 정리
         for r, c in remove_items:
             new_store[r][c] = '-'
+            pos_infos[target_ch].remove((r,c))
+            
     
-    # for a in new_store:
-    #     print(a)
+    for a in new_store:
+        print(a)
     
     return answer
 
