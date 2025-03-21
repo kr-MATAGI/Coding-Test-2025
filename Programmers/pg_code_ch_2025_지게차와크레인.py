@@ -12,6 +12,7 @@
     
     
 '''
+from collections import deque
 
 def solution(storage, requests):
     answer = 0
@@ -20,7 +21,7 @@ def solution(storage, requests):
     row_len = len(storage) + 2
     col_len = len(storage[0]) + 2
     new_store = [ ['-' for _ in range(col_len) ] for _ in range(row_len) ] 
-    visited = [ [False for _ in range(col_len) ] for _ in range(row_len) ]
+    # visited = [ [False for _ in range(col_len) ] for _ in range(row_len) ]
     
     '''
         ['-', '-', '-', '-', '-', '-', '-']
@@ -52,6 +53,15 @@ def solution(storage, requests):
         [False, False, False, False, False]
         [False, False, False, False, False]
         [False, False, False, False, False]
+
+
+        ['-', '-', '-', '-', '-']
+        ['-', 'H', 'H', 'H', '-']
+        ['-', 'H', 'H', 'H', '-']
+        ['-', 'H', 'A', 'H', '-']
+        ['-', 'H', 'H', 'H', '-']
+        ['-', 'H', 'H', 'H', '-']
+        ['-', '-', '-', '-', '-']
     '''
     
     pos_infos = {}
@@ -65,8 +75,6 @@ def solution(storage, requests):
             else:
                 pos_infos[new_store[rdx+1][cdx+1]].append((rdx+1, cdx+1))
     
-    # for r, v in pos_infos.items():
-    #     print(r, v)
 
     # Calc
     def is_able_move_container(
@@ -75,34 +83,43 @@ def solution(storage, requests):
         visited,
     ):
         '''
-            DFS
+            DFS -> BFS
             상화좌우로 끝까지 가봐서 뚤려있으면 ok
         '''
-        if cr == row_len - 1 or cc == col_len - 1: # 끝에 도달
-            if '-' == store[cr][cc]: # 뚤려있음
-                return True
-            
+        visited[cr][cc] = True
+
+        que = deque()
+        que.append([cr, cc])
+    
         # 상하좌우
         dx = [-1, 1, 0, 0]
         dy = [0, 0, -1, 1]
         
-        for d in range(4):
-            next_r = cr + dx[d]
-            next_c = cc + dy[d]
+        while que:
+            cur_item = que.popleft()
 
-            if not (0 <= next_r < row_len and 0 <= next_c < col_len):
-                continue
-            elif visited[next_r][next_c]:
-                continue
-            elif '-' != store[next_r][next_c]: # 막혀있으니까 볼 필요 없음
-                continue
+            # 끝에 도달
+            if (
+                (0 == cur_item[0] or cur_item[0] == row_len - 1) or
+                (0 == cur_item[1] or cur_item[1] == col_len - 1)
+            ): 
+                if '-' == store[cur_item[0]][cur_item[1]]: # 뚤려있음
+                    return True
 
-            visited[next_r][next_c] = True
-            ret_val = is_able_move_container(store, next_r, next_c, visited)
-            visited[next_r][next_c] = False
-            
-            if ret_val: # 길 하나 찾았으니 리턴
-                return True
+            for d in range(4):
+                next_r = cur_item[0] + dx[d]
+                next_c = cur_item[1] + dy[d]
+
+                if not (0 <= next_r < row_len and 0 <= next_c < col_len):
+                    continue
+                elif visited[next_r][next_c]:
+                    continue
+                elif "-" != store[next_r][next_c]: 
+                    # 막혀있으니까 볼 필요 없음
+                    continue
+                
+                visited[next_r][next_c] = True
+                que.append([next_r, next_c])
         
         return False
     ###
@@ -119,18 +136,17 @@ def solution(storage, requests):
             # 지게차 사용
             for r, c in pos_infos[req_item]:
                 if req_item == new_store[r][c]:
-                    visited[r][c] = True
+                    visited = [ [False for _ in range(col_len) ] for _ in range(row_len) ]
+                    # print(f"{req_item}, {[r, c]}, {pos_infos[req_item]}")                    
                     is_moving = is_able_move_container(
                         new_store,
                         r, c,
                         visited
                     )
-                    visited[r][c] = False
                     # print(f"[{r},{c}] - {new_store[r][c]}, {is_moving}\n")
                         
                     if is_moving:
                         remove_items.append((r,c)) # 컨테이너를 뺌
-                        answer -= 1
                     
         else:
             if not req_item[0] in pos_infos.keys():
@@ -140,13 +156,14 @@ def solution(storage, requests):
             # 크레인 사용
             for r, c in pos_infos[req_item[0]]:
                 remove_items.append((r,c)) # 컨테이너를 뺌
-                answer -= 1            
-                        
 
         # 뺀 컨테이너 정리
         for r, c in remove_items:
             new_store[r][c] = '-'
+            answer -= 1
+
             pos_infos[target_ch].remove((r,c))
+            # print(f"target: {target_ch}\n{pos_infos[target_ch]}")
             
     
     for a in new_store:
@@ -159,12 +176,33 @@ def solution(storage, requests):
 if "__main__" == __name__:
     ans_1 = solution(
         ["AZWQY", "CAABX", "BBDDA", "ACACA"],
-        ["A", "BB", "A"],
+        ["A", "BB", "A", 'C', 'Q', 'AA'],
     )
     print(ans_1)
 
     ans_2 = solution(
         ["HAH", "HBH", "HHH", "HAH", "HBH"],
-        ["C", "B", "B", "B", "B", "H"]
+        ["C", "B", "B", "B", "B", "H", 'A', "H", "BB"]
     )
     print(ans_2)
+
+    ans_3 = solution(
+        ['HHH', 'HHH' 'HHH', 'HAH', 'HAH', 'HHH', 'HHH'],
+        ['AA', 'H']
+    )
+
+    '''
+        ['-', '-', '-', '-', '-', '-']
+        ['-', 'A', 'A', 'A', 'A', '-']
+        ['-', 'A', '-', 'A', 'A', '-']
+        ['-', 'A', '-', 'A', 'A', '-']
+        ['-', 'A', '-', 'A', 'A', '-']
+        ['-', '-', '-', '-', '-', '-']
+    '''
+    ans_4 = solution(
+        ["AAAA", "ABAA", "ABAA", "ACAA"],
+        # ['CC','BB','A']
+        # ["CC"]
+        # ["CC", "BB"]
+        ["CC", "BB", 'A']
+    )
