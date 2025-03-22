@@ -14,83 +14,48 @@
 '''
 def solution(scores):
     
-    '''
-        1. 인센티브 못 받는 경우 (두 점수 미만 경우) 찾기
-    '''
-    lose_infos = [[], []] # 점수1, 점수2 Idx
+    answer = 0 
     
-    # 1, 2 점수를 나눠서 계산 
-    score_1_infos = [] # [인덱스, 점수]
-    score_2_infos = []
+    scores_sorted = sorted(scores, key=lambda x: (-x[0], x[1])) # 태도 내림차순, 동료 오름차순
     
-    for idx, (sc_1, sc_2) in enumerate(scores):
-        score_1_infos.append((idx, sc_1))
-        score_2_infos.append((idx, sc_2))
-    score_1_infos.sort(key=lambda x: x[1])
-    score_2_infos.sort(key=lambda x: x[1])
+    wanho_score = scores[0]
+    max_peer = 0
+    filtered = []
     
-    wan_1_sc = scores[0][0]
-    wan_2_sc = scores[0][1]
-    # lose_info 에 넣기 (완호 기준으로만 검색)
-    sc_1_end = False
-    sc_2_end = False
-    for step in range(len(score_1_infos)):
-        if sc_1_end and sc_2_end:
-            break
+    for att, peer in scores_sorted:
+        if peer < max_peer:
+            continue
         
-        # 점수 1 검사
-        if not sc_1_end:
-            if (
-                0 != score_1_infos[step][0] or 
-                wan_1_sc < score_1_infos[step][1]
-            ):
-                lose_infos[0].append(score_1_infos[step][0])
-            
-            elif 0 == score_1_infos[step][0]:
-                sc_1_end = True
-        
-        # 점수 2 검사
-        if not sc_2_end:
-            if (
-                0 != score_2_infos[step][0] or
-                wan_2_sc < score_2_infos[step][1]
-            ):
-                lose_infos[0].append(score_2_infos[step][0])
-            
-            elif 0 == score_2_infos[step][0]:
-                sc_2_end = True
-    ###    
-    lose_infos[0].extend(lose_infos[1])
-    double_loose = list(set(lose_infos[0]))
-    wan_no_incen = True if (len(lose_infos[0]) + len(lose_infos[1])) != len(double_loose) else False
+        max_peer = max(peer, max_peer)
+        filtered.append([att, peer])
     
-    '''
-        2. 점수 합으로 석차 구하기
-    '''
-    sum_scores = [] # [인덱스, 점수 합]
-    for idx, sc in enumerate(scores):
-        sum_scores.append((idx, sum(sc)))
+    # print(scores_sorted)
+    # print(filtered)
     
-    sum_scores.sort(key=lambda x: x[1], reverse=True)
+    # 원호는 인센 못 받음
+    if not wanho_score in filtered:
+        return -1
     
-    # 석차 계산
-    idx_0_rank = 0
-    rank_num = 0
-    prev_score = -1
-    same_rank_stack = 0
-    rank_infos = [] # [인덱스, 점수 합, 랭크]
+    # 랭크
+    sum_scores = [sum(x) for x in filtered]
+    sum_scores.sort(reverse=True)
+    
+    rank = 0
+    prev_sc = -1
+    stack = 0
+    
     for sc in sum_scores:
-        if prev_score == sc[1]:
-            # 동일 석차
-            rank_infos.append((sc[0], sc[1], rank_num))
-            same_rank_stack += 1
+        if sc == prev_sc:
+            stack += 1
         else:
-            rank_num += (1 + same_rank_stack)
-            same_rank_stack = 0 # 누적치 초기화
-            prev_score = sc[1]
+            rank += (1 + stack)
+            stack = 0
+            prev_sc = sc
             
-            rank_infos.append((sc[0], sc[1], rank_num))
+        if sc == sum(wanho_score):
+            return rank
     
-    rank_infos.sort(key=lambda x: x[0])
-    answer = rank_infos[0][-1] if not wan_no_incen else -1
+    answer = rank_infos[0]
+    # print(rank_infos)
+    
     return answer
