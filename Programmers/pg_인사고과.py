@@ -29,7 +29,7 @@ def solution(scores):
         max_peer = max(peer, max_peer)
         filtered.append([att, peer])
     
-    # print(scores_sorted)
+    print(scores_sorted)
     # print(filtered)
     
     # 원호는 인센 못 받음
@@ -55,7 +55,11 @@ def solution(scores):
         if sc == sum(wanho_score):
             return rank
     
-    answer = rank_infos[0]
-    # print(rank_infos)
-    
     return answer
+
+### MAIN ###
+if "__main__" == __name__:
+    ans_1 = solution(
+        [[2,2],[3,4],[3,2],[3,2],[2,1]]	
+    )
+    print(ans_1)
