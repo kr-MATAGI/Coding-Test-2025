@@ -27,3 +27,4 @@
 
 ## 삼성 코딩 테스트 기출
 - https://www.codetree.ai/ko/frequent-problems/problems/virus-detector/description
+- [기출 분석](https://www.codetree.ai/blog/%EC%82%BC%EC%84%B1-%EA%B8%B0%EC%B6%9C%EB%AC%B8%EC%A0%9C%EB%A1%9C-%EB%B3%B4%EB%8A%94-%EC%B5%9C%EA%B7%BC-%EA%B8%B0%EC%97%85-%EC%BD%94%EB%94%A9-%ED%85%8C%EC%8A%A4%ED%8A%B8-%EB%82%9C%EC%9D%B4%EB%8F%84/)
