@@ -8,56 +8,47 @@ https://school.programmers.co.kr/learn/courses/30/lessons/67258
 '''
 
 def solution(gems):
+    '''
+        1) 고유한 값들 보관
+        2) s와 e를 통해 자릿수 인덱싱
+        3) e를 앞세워서 고유한 값들 최소 1개씩 포함될때까지 앞으로 이동
+        4) 다 찾으면 s를 하나씩 줄임
+    '''
     answer = []
 
-    '''
-        1. 보석의 중복 제거 필요 -> 2번 과정이 있으니 필요 없을 듯?
-        2. 전체 길이에서 조금씩 줄여가는 것이 필요
-            - 왼쪽에서 줄이다가 하나가 0이 되어버리면 줄이지 않음
-            -> 오른쪽으로 줄이기 시작 -> 하나가 0이 되어버리면 줄이지 않음
-    '''
+    # 고유한 값들 확인
+    target_set = set(gems)
 
-    # Make Dict
-    gem_infos = {}
-    for gem in gems:
-        if not gem in gem_infos.keys():
-            gem_infos[gem] = 1
-        else:
-            gem_infos[gem] += 1
+    # 현재 보석 보유량 확인할 dict
+    gem_cnt_info = {x: 0 for x in target_set}
+    # print(cur_gem_info)
 
-    # Start Calc
-    left_idx = 0
-    right_idx = len(gems) - 1
+    # 계산
+    s, e = 0, 0 # start_idx, end_idx
 
-    is_left_end = False
-    is_right_end = False
-
+    cur_set = set() # 현재 중복제거한 보석들
     while True:
-        if is_left_end and is_right_end:
+        cur_gem = gems[e]
+        gem_cnt_info[cur_gem] += 1
+        cur_set.add(cur_gem)
+        if cur_set == target_set:
+            # 모든 보석이 1개 이상씩 존재
             break
 
-        if not is_right_end:
-            # 오른쪽 이동
-            right_gem = gems[right_idx]
-            if 1 < gem_infos[right_gem]:
-                right_idx -= 1
-                gem_infos[right_gem] -= 1
-            else:
-                is_right_end = True
+        e += 1
 
+    # s를 1씩 높여가봄
+    while True:
+        cur_gem = gems[s]
+        # print(f"s: {s}, cur_gem: {cur_gem}, gem_cnt_info: {gem_cnt_info[cur_gem]}")
+        if 1 <= gem_cnt_info[cur_gem] - 1:
+            # 해당 보석이 아직 1개 이상 있음
+            gem_cnt_info[cur_gem] -= 1
+            s += 1
         else:
-            left_gem = gems[left_idx]
-            if 1 < gem_infos[left_gem]:
-                # 아직 해당 보석이 1개 이상이므로 진행 가능
-                left_idx += 1
-                gem_infos[left_gem] -= 1
-            else:
-                is_left_end = True
+            break
 
-        # print(f"left - idx: {left_idx}, gem: {gems[left_idx]}, right - idx: {right_idx}, gem: {gems[right_idx]}, {gem_infos}")
-
-    # Answer
-    answer = [left_idx + 1, right_idx + 1]
+    answer = [s + 1, e + 1]
     return answer
 
 
@@ -73,3 +64,6 @@ if "__main__" == __name__:
 
     ans_4 = solution(["ZZZ", "YYY", "NNNN", "YYY", "BBB"]	)
     print(f"ans_4: {ans_4}\n")
+
+    ans_5 = solution(["A", "B", "C", "A", "A", "B", "C", "C"])
+    print(f"ans_5: {ans_5}\n")
