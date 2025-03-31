@@ -19,11 +19,14 @@ https://school.programmers.co.kr/learn/courses/30/lessons/250136
 from collections import deque
 from typing import List, Tuple
 
+
 def bfs(
     cur_pos: Tuple[int, int],
     land: List[List[int]],
     visited: List[List[bool]],
-    score_board: List[List[int]]
+    score_board: List[List[int]],
+    conn_board: List[List[int]],
+    connect_num: int
 ):
     score = 0
     que = deque([cur_pos])
@@ -66,38 +69,60 @@ def bfs(
     # 점수 매기기
     for pr, pc in paths:
         score_board[pr][pc] = score
+        conn_board[pr][pc] = connect_num
 
 def solution(land):
     answer = 0
 
-    results = [] # 컬럼 인덱스별 뽑은 양 [ 인덱스, 시추 종합 ]
-
     m_len = len(land)
     n_len = len(land[0])
-    max_score = 0
 
     # 점수판 만들어 놓기
     score_board = [[0 for _ in range(n_len)] for _ in range(m_len)]
-    for r_idx in range(m_len):
-        visited = [[False for _ in range(n_len)] for _ in range(m_len)]
-        for c_idx in range(n_len):
-            if visited[r_idx][c_idx]:
-                continue
 
+    conn_board = [[0 for _ in range(n_len)] for _ in range(m_len)]
+    connect_num = 1
+
+    visited = [[False for _ in range(n_len)] for _ in range(m_len)]
+    for r_idx in range(m_len):
+        for c_idx in range(n_len):
             if 0 == land[r_idx][c_idx]:
                 visited[r_idx][c_idx] = True
+                continue
+
+            if visited[r_idx][c_idx]:
                 continue
 
             bfs(
                 cur_pos=(r_idx, c_idx),
                 land=land,
                 visited=visited,
-                score_board=score_board
+                score_board=score_board,
+                conn_board=conn_board,
+                connect_num=connect_num,
             )
 
-    for b in score_board:
-        print(b)
+            connect_num += 1
+
+    def col_sum(src, conn):
+        sc = 0
+        target = set()
+        for i, (s, c) in enumerate(zip(src, conn)):
+            if c not in target:
+                sc += s
+                target.add(c)
+
+        return sc
+
+    columns_sums = [col_sum(sc, cc) for sc, cc in zip(zip(*score_board), zip(*conn_board))]
+    answer = max(columns_sums)
+
+    for s in score_board:
+        print(s)
     print()
+    for c in conn_board:
+        print(c)
+    print(f"\n{columns_sums}")
 
     return answer
 
@@ -152,3 +177,19 @@ if "__main__" == __name__:
         [1, 0, 1],
     ])
     print(f"ANS_6: {ans_6}\n")
+
+    ans_7 = solution([
+        [0, 1, 0],
+        [0, 1, 0],
+        [0, 0, 0],
+    ])
+    print(f"ans_7: {ans_7}\n")
+
+    ans_8 = solution([
+        [1, 1, 1, 1, 1],
+        [1, 0, 0, 0, 0],
+        [1, 0, 0, 1, 0],
+        [1, 0, 0, 0, 0],
+        [1, 1, 1, 1, 1]
+    ])
+    print(f"ans_8: {ans_8}\n")
