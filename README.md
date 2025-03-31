@@ -25,4 +25,5 @@
     - TODO:
         - 선물나눠주기 Easy
 
-- LeetCode
+## 삼성 코딩 테스트 기출
+- https://www.codetree.ai/ko/frequent-problems/problems/virus-detector/description
