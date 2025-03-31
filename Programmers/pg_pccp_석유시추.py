@@ -23,6 +23,7 @@ def bfs(
     cur_pos: Tuple[int, int],
     land: List[List[int]],
     visited: List[List[bool]],
+    score_board: List[List[int]]
 ):
     score = 0
     que = deque([cur_pos])
@@ -33,12 +34,19 @@ def bfs(
     def check_in_range(r, c):
         return 0 <= r < len(land) and 0 <= c < len(land[0])
 
+    paths = []
     while que:
         row, col = que.popleft()
         visited[row][col] = True
 
+        paths.append((row, col))
+
         if land[row][col] == 0:
             continue
+
+        if 0 < score_board[row][col]:
+            score = score_board[row][col]
+            break
 
         # 점수 +1 후 사방향 탐색
         score += 1
@@ -54,10 +62,10 @@ def bfs(
 
             if 1 == land[next_row][next_col]:
                 que.append((next_row, next_col))
-                # print(f"pos: {(row, col)}, score: {score}, visited: {visited[row][col]}, next: {(next_row, next_col)}, que: {que}")
-                # input()
 
-    return score
+    # 점수 매기기
+    for pr, pc in paths:
+        score_board[pr][pc] = score
 
 def solution(land):
     answer = 0
@@ -66,29 +74,31 @@ def solution(land):
 
     m_len = len(land)
     n_len = len(land[0])
+    max_score = 0
 
-    # 0 인덱스부터 천천히 뽑아 봅시다
-    for c_idx in range(n_len):
-        visited = [ [False for _ in range(n_len)] for _ in range(m_len)]
-        score = 0
-        for r_idx in range(m_len):
+    # 점수판 만들어 놓기
+    score_board = [[0 for _ in range(n_len)] for _ in range(m_len)]
+    for r_idx in range(m_len):
+        visited = [[False for _ in range(n_len)] for _ in range(m_len)]
+        for c_idx in range(n_len):
             if visited[r_idx][c_idx]:
                 continue
 
             if 0 == land[r_idx][c_idx]:
+                visited[r_idx][c_idx] = True
                 continue
 
-            score += bfs(
+            bfs(
                 cur_pos=(r_idx, c_idx),
                 land=land,
-                visited=visited
+                visited=visited,
+                score_board=score_board
             )
 
-        results.append((c_idx, score))
+    for b in score_board:
+        print(b)
+    print()
 
-    results.sort(key=lambda x: x[1], reverse=True)
-    answer = results[0][1]
-    # print(results)
     return answer
 
 
@@ -113,3 +123,32 @@ if "__main__" == __name__:
         [1, 1, 1, 1, 1, 1]
     ])
     print(f"ANS_2: {ans_2}\n")
+
+    ans_3 = solution([
+        [1, 0, 1, 0, 1, 1],
+        [1, 0, 1, 0, 0, 0],
+        [1, 0, 1, 0, 0, 1],
+        [1, 0, 0, 1, 0, 0],
+        [1, 0, 0, 1, 0, 1],
+        [1, 0, 0, 0, 0, 1],
+        [1, 0, 1, 1, 0, 1]
+    ])
+    print(f"ANS_3: {ans_3}\n")
+
+    ans_4 = solution([
+        [1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1],
+    ])
+    print(f"ANS_4: {ans_4}\n")
+
+    ans_5 = solution([
+        [1],
+    ])
+    print(f"ANS_5: {ans_5}\n")
+
+    ans_6 = solution([
+        [1,0,0],
+        [0, 0, 0],
+        [1, 0, 1],
+    ])
+    print(f"ANS_6: {ans_6}\n")
