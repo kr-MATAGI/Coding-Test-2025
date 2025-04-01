@@ -9,30 +9,31 @@
     A는 자신이 승리할 확률이 가장 높아지도록 주사위를 가질려고 함
 '''
 from itertools import combinations, product
+from typing import List
 from collections import Counter
 
-def solution(dice):
-    answer = []
+def solution(dice: List[List[int]]) -> List[int]:
+    n = len(dice)                 # 주사위 개수
+    half = n // 2                 # A, B가 각각 가질 주사위 개수
+    dice_idx = list(range(n))    # 주사위 인덱스 (0부터 n-1까지)
+    max_win = -1                 # A의 최대 승리 횟수 저장용
+    best_combo = []              # A가 선택할 최적 주사위 조합
 
-    dice_cnt = len(dice)
-    dice_ids = list(range(dice_cnt))
-    half_val = dice_cnt // 2
-    max_win = -1
+    # A가 고를 수 있는 모든 주사위 조합을 순회
+    for a_dice in combinations(dice_idx, half):
+        b_dice = [i for i in dice_idx if i not in a_dice]  # B는 나머지 주사위 선택
 
-    # A, B의 가능한 모든 점수 조합을 계산
-    def get_all_sums(dices):
-        all_rolls = list(product(*[dice[i] for i in dices]))
-        sums = [sum(tup) for tup in all_rolls]
-        return Counter(sums)
+        # 해당 조합에서 주사위로 나올 수 있는 모든 점수 합을 구하는 함수
+        def get_all_sums(dice_group):
+            all_rolls = list(product(*[dice[i] for i in dice_group]))  # 각 주사위의 눈을 곱집합으로 생성
+            sums = [sum(tup) for tup in all_rolls]                     # 각 경우의 점수 합
+            return Counter(sums)  # 각 합이 몇 번 나오는지 세어줌 (딕셔너리 형태)
 
-    # A 가 고를 수 있는 모든 조합
-    for a_dice in combinations(dice_ids, half_val):
-        b_dice = [i for i in dice_ids if i not in a_dice]
+        a_sums = get_all_sums(a_dice)  # A가 낼 수 있는 모든 점수 합 분포
+        b_sums = get_all_sums(b_dice)  # B가 낼 수 있는 모든 점수 합 분포
 
-        a_sums = get_all_sums(a_dice)
-        b_sums = get_all_sums(b_dice)
-
-        # B의 누적합 준비 (누적 패 개수)
+        # B의 점수들을 오름차순 정렬하고 누적합 계산
+        # → A가 특정 점수를 냈을 때, 그보다 낮은 B의 점수가 몇 개나 되는지 빠르게 알기 위함
         b_keys_sorted = sorted(b_sums)
         b_cum = []
         b_total = 0
@@ -43,15 +44,19 @@ def solution(dice):
         # A가 이기는 경우의 수 계산
         win_count = 0
         for a_score, a_count in a_sums.items():
-            for b_score, b_count_cum in b_cum:
+            # A 점수보다 낮은 B 점수에 대해서만 승리 가능
+            for b_score, _ in b_cum:
                 if b_score >= a_score:
                     break
                 win_count += a_count * b_sums[b_score]
+                # A가 해당 점수를 낼 경우, B가 b_score을 낼 확률만큼 승리 횟수 누적
 
+        # 지금까지 중 가장 높은 승리 수라면 저장
         if win_count > max_win:
             max_win = win_count
             best_combo = list(a_dice)
 
+    # 결과는 1-indexed로 정답 출력
     return [i + 1 for i in sorted(best_combo)]
 
 
