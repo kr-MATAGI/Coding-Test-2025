@@ -8,40 +8,67 @@
 
     A는 자신이 승리할 확률이 가장 높아지도록 주사위를 가질려고 함
 '''
-from collections import defaultdict
-
+from itertools import combinations, product
+from collections import Counter
 
 def solution(dice):
     answer = []
 
-    dice_win_info = defaultdict(int)
+    dice_cnt = len(dice)
+    dice_ids = list(range(dice_cnt))
+    half_val = dice_cnt // 2
+    max_win = -1
 
-    dice_len = len(dice)
-    for b_idx, base_dice in enumerate(dice):
-        dice_win_info[b_idx] = defaultdict(int)
+    # A, B의 가능한 모든 점수 조합을 계산
+    def get_all_sums(dices):
+        all_rolls = list(product(*[dice[i] for i in dices]))
+        sums = [sum(tup) for tup in all_rolls]
+        return Counter(sums)
 
-        for o_idx, other_dice in enumerate(dice):
-            if o_idx == b_idx:
-                continue
+    # A 가 고를 수 있는 모든 조합
+    for a_dice in combinations(dice_ids, half_val):
+        b_dice = [i for i in dice_ids if i not in a_dice]
 
-            # 숫자가 다른 다이스에서 몇 번 이길 수 있는지 계산
-            for b_num in base_dice:
-                for o_num in other_dice:
-                    if b_num > o_num:
-                        dice_win_info[b_idx][b_num] += 1
+        a_sums = get_all_sums(a_dice)
+        b_sums = get_all_sums(b_dice)
 
-    # print(dice_win_info)
-    dice_total_wins = {i + 1: 0 for i in range(dice_len)}
-    # 다이스-눈금 별 이긴 횟수 총합
-    for dice_id, dice_num_wins in dice_win_info.items():
-        for win in dice_num_wins.values():
-            dice_total_wins[dice_id + 1] += win
-    # 정렬
-    sorted_wins = list(dice_total_wins.items())
-    sorted_wins.sort(key=lambda x: x[1], reverse=True)
-    print(sorted_wins)
-    sorted_wins = sorted_wins[:dice_len // 2]
+        # B의 누적합 준비 (누적 패 개수)
+        b_keys_sorted = sorted(b_sums)
+        b_cum = []
+        b_total = 0
+        for k in b_keys_sorted:
+            b_total += b_sums[k]
+            b_cum.append((k, b_total))
 
-    answer = [x[0] for x in sorted_wins]
-    answer.sort()
-    return answer
+        # A가 이기는 경우의 수 계산
+        win_count = 0
+        for a_score, a_count in a_sums.items():
+            for b_score, b_count_cum in b_cum:
+                if b_score >= a_score:
+                    break
+                win_count += a_count * b_sums[b_score]
+
+        if win_count > max_win:
+            max_win = win_count
+            best_combo = list(a_dice)
+
+    return [i + 1 for i in sorted(best_combo)]
+
+
+### MAIN ###
+if "__main__" == __name__:
+    ans_1 = solution(
+        [[1, 2, 3, 4, 5, 6], [3, 3, 3, 3, 4, 4], [1, 3, 3, 4, 4, 4], [1, 1, 4, 4, 5, 5]]
+    )
+    print(f"ans_1: {ans_1}\n")
+
+
+    ans_2 = solution(
+        [[1, 2, 3, 4, 5, 6], [2, 2, 4, 4, 6, 6]]
+    )
+    print(f"ans_2: {ans_2}\n")
+
+    ans_3 = solution(
+        [[40, 41, 42, 43, 44, 45], [43, 43, 42, 42, 41, 41], [1, 1, 80, 80, 80, 80], [70, 70, 1, 1, 70, 70]]
+    )
+    print(f"ans_3: {ans_3}\n")
