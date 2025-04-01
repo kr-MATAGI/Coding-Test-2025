@@ -12,30 +12,21 @@
 
 from collections import deque
 
-
 def solution(targets):
     answer = 0
 
-    targets = [(i, x[0], x[1], x[1] - x[0]) for i, x in enumerate(targets)]
-    targets.sort(key=lambda x: x[-1], reverse=True)
+    targets.sort(key=lambda x: x[1])
     # print(targets)
 
-    tgt_que = deque(targets)
-    del_list = []
-    while tgt_que:
-        tgt = tgt_que.popleft()
-        if tgt[0] in del_list:
+    prev_tgt = targets[0]
+    answer += 1
+    for next_tgt in targets[1:]:
+        if prev_tgt[0] < next_tgt[0] < prev_tgt[1] or prev_tgt[0] < next_tgt[1] < prev_tgt[1]:
             continue
-        del_list.append(tgt[0])
-        answer += 1
-
-        for i, other in enumerate(targets):
-            if i in del_list or tgt[0] == i:
-                # 이미 요격되었거나 베이스 대상과 같음
-                continue
-
-            if tgt[1] < other[0] < tgt[2] or tgt[1] < other[1] < tgt[2]:
-                # print(f"tgt: {tgt}, other: {other}")
-                del_list.append(i)
+        elif next_tgt[0] < prev_tgt[0] < next_tgt[1] or next_tgt[0] < prev_tgt[1] < next_tgt[1]:
+            continue
+        else:
+            answer += 1
+            prev_tgt = next_tgt
 
     return answer
