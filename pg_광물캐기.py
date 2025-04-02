@@ -12,7 +12,6 @@
 from itertools import combinations, product, permutations
 from collections import deque
 
-
 def solution(picks, minerals):
     '''
         picks: [다이아, 철, 돌]
@@ -25,46 +24,65 @@ def solution(picks, minerals):
         [25, 5, 1]
     ]
 
+    mine_values = deque([])
     for i, item in enumerate(minerals):
         if "diamond" == item:
             minerals[i] = 0
+            mine_values.append(25)
         elif "iron" == item:
             minerals[i] = 1
+            mine_values.append(5)
         else:
             minerals[i] = 2
+            mine_values.append(1)
+
+    print(mine_values)
+    subset_values = []
+    add_idx = 0
+    while mine_values:
+        temp_val = []
+        for _ in range(5):
+            if not mine_values:
+                break
+            temp_val.append(mine_values.popleft())
+        subset_values.append((add_idx, sum(temp_val)))
+        add_idx += 1
+
+    subset_values.sort(key=lambda x: x[1], reverse=True)
+    print(subset_values)
 
     #####
+    tool_set = []
+    for i in range(3):
+        for _ in range(picks[i]):
+            tool_set.append(i)
+    print(tool_set)
 
-    MIN_VAL = float('inf')
+    tool_plan = []
+    tool_que = deque(tool_set)
+    subset_que = deque(subset_values)
+    while tool_que and subset_que:
+        sub_item = subset_que.popleft()
+        tool_item = tool_que.popleft()
 
-    tools = []
-    for i, item in enumerate(picks):
-        for _ in range(item):
-            tools.append(i)
+        tool_plan.append((sub_item[0], tool_item))
 
-    for case in permutations(tools, len(tools)):
-        cur_tired = 0
+    tool_plan.sort(key=lambda x: x[0])
+    print(tool_plan)
 
-        tool_que = deque(case)
-        cur_tool = tool_que.popleft()
-        use_cnt = 5
-        for mine in minerals:
-            if MIN_VAL <= cur_tired:  # 더 이상 할 필요 없음
+    plan_que = deque(tool_plan)
+    cur_plan = plan_que.popleft()
+    use_cnt = 5
+
+    for mine in minerals:
+        if 0 >= use_cnt:
+            if not plan_que:
                 break
+            cur_plan = plan_que.popleft()
+            use_cnt = 5
 
-            if 0 >= use_cnt:  # 새로운 도구 꺼냄
-                if not tool_que:
-                    break
-                cur_tool = tool_que.popleft()
-                use_cnt = 5
+        answer += energe[cur_plan[1]][mine]
 
-            # 곡갱이-광물 피로도 계산
-            cur_tired += energe[cur_tool][mine]
-            use_cnt -= 1
+        use_cnt -= 1
 
-        if MIN_VAL > cur_tired:
-            MIN_VAL = cur_tired
-
-    ###
-    answer = MIN_VAL
     return answer
