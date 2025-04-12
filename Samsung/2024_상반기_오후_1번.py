@@ -36,7 +36,6 @@ https://www.codetree.ai/ko/frequent-problems/problems/magical-forest-exploration
 # Import
 import copy
 from collections import deque
-from zipfile import compressor_names
 
 # Global
 MAX_SIZE = 70
@@ -282,12 +281,12 @@ while golem_que:
     FIELD[cur_golem.right[0]][cur_golem.right[1]] = cur_golem.g_id
     FIELD[cur_golem.bottom[0]][cur_golem.bottom[1]] = cur_golem.g_id
 
-    for rrr in FIELD:
-        print(rrr)
-    print()
-    
     # 3-2. 출구 위치 표시
     EXIT_POS[cur_golem.ex_pos[0]][cur_golem.ex_pos[1]] = True
+
+    for rrr, eee in zip(FIELD, EXIT_POS):
+        print(f"{rrr}\t{eee}")
+    print()
 
     # 4. 삐져나온 부분 있는지 확인
     is_outside = False
@@ -319,7 +318,6 @@ while golem_que:
         while south_que:
             south_golem = south_que.popleft()
             south_id = FIELD[south_golem[0]][south_golem[1]]  # 골렘 아이디
-            print(f"south_golem.cur_pos: {south_golem}")
 
             if max_value < south_golem[0] - 2:
                 max_value = south_golem[0] - 2
@@ -338,12 +336,17 @@ while golem_que:
 
                 if visited[next_r][next_c]:
                     continue
+                
+                if 0 == FIELD[next_r][next_c]:
+                    # 골렘 범위가 아님
+                    continue
 
                 if south_id != FIELD[next_r][next_c]:
                     if not EXIT_POS[south_golem[0]][south_golem[1]]:
                         # 만약 두 개의 아이디가 다르다면, 현재 위치는 출구여야 함
                         continue
 
+                print(f"south_golem.cur_pos: {south_golem}, south_id: {south_id}-{FIELD[next_r][next_c]}, {EXIT_POS[south_golem[0]][south_golem[1]]}")
                 visited[next_r][next_c] = True
                 south_que.append([next_r, next_c])
 
