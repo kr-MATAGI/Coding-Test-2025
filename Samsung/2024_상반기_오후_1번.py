@@ -31,6 +31,9 @@ https://www.codetree.ai/ko/frequent-problems/problems/magical-forest-exploration
 6 0
 
 
+*** 제출할 땐 print 없애자!
+
+
 '''
 
 # Import
@@ -173,6 +176,7 @@ def move_golem_right(t_golem: GOLEM):
 # 계산
 answer = 0
 golem_id = 0
+history = {}
 while golem_que:
     c_i, d_i = golem_que.popleft()
     c_i -= 1
@@ -303,6 +307,7 @@ while golem_que:
         print(f"초기화 - golem_id: {cur_golem.g_id}")
         FIELD = [ [0 for _ in range(C)] for _ in range(R) ]
         EXIT_POS = [ [False for _ in range(C)] for _ in range(R) ]
+        history = {}
     else:
         # 5. 남쪽으로 최대 이동
         print(f"남쪽으로 이동 시작 id: {cur_golem.g_id}, {cur_golem.mid}")
@@ -318,6 +323,9 @@ while golem_que:
         while south_que:
             south_golem = south_que.popleft()
             south_id = FIELD[south_golem[0]][south_golem[1]]  # 골렘 아이디
+            if south_id in history.keys():
+                max_value = max_value if max_value > history[south_id] else history[south_id]
+                continue
 
             if max_value < south_golem[0] - 2:
                 max_value = south_golem[0] - 2
@@ -336,7 +344,7 @@ while golem_que:
 
                 if visited[next_r][next_c]:
                     continue
-                
+
                 if 0 == FIELD[next_r][next_c]:
                     # 골렘 범위가 아님
                     continue
@@ -352,6 +360,7 @@ while golem_que:
 
         # 정답에 누적
         answer += max_value
+        history[cur_golem.g_id] = max_value
         print(f"정답에 누적 - [{cur_golem.g_id}]: {max_value}, {answer}")
 
 # 출력
